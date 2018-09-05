@@ -13,37 +13,15 @@ import (
 
 func main() {
 	var (
-		strin, strout string
-		hexin, hexout string
-		key, nonce    string
+		in, out    string
+		key, nonce string
 	)
-	flag.StringVar(&strin, "in", "", "input file")
-	flag.StringVar(&strout, "out", "", "output file")
-	flag.StringVar(&hexin, "hexin", "", "input file")
-	flag.StringVar(&hexout, "hexout", "", "output file")
+	flag.StringVar(&in, "in", "", "input file")
+	flag.StringVar(&out, "out", "", "output file")
 	flag.StringVar(&key, "key", "", "key")
 	flag.StringVar(&nonce, "nonce", "", "nonce")
 	flag.Parse()
-	var in, out []byte
-	if hexin != "" {
-		in, err := hex.DecodeString(hexin)
-		if err != nil {
-			log(err.Error())
-			os.Exit(1)
-		}
-	} else if strin != "" {
-		in = []byte(strin)
-	}
-	if hexout != "" {
-		out, err := hex.DecodeString(hexout)
-		if err != nil {
-			log(err.Error())
-			os.Exit(1)
-		}
-	} else if strout != "" {
-		out = []byte(strout)
-	}
-	if len(in) == 0 || len(out) == 0 || key == "" || nonce == "" {
+	if in == "" || out == "" || key == "" || nonce == "" {
 		printUsage(fmt.Sprintf("in=%s,out=%s,key=%s,nonce=%s", in, out, key, nonce))
 		os.Exit(1)
 	}
@@ -123,7 +101,11 @@ func encrypt(key, nonce string, payload []byte) ([]byte, error) {
 }
 
 func parseSymmetricKey(key string) (cipher.AEAD, error) {
-	block, err := aes.NewCipher([]byte(key))
+	n, err := hex.DecodeString(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode hex key: %v", err)
+	}
+	block, err := aes.NewCipher(n)
 	if err != nil {
 		return nil, err
 	}
@@ -132,4 +114,16 @@ func parseSymmetricKey(key string) (cipher.AEAD, error) {
 		return nil, err
 	}
 	return aesgcm, nil
+}
+
+func stringOrHex(s, h string) (res []byte, err error) {
+	if h != "" {
+		res, err = hex.DecodeString(h)
+		if err != nil {
+			return
+		}
+	} else if s != "" {
+		res = []byte(s)
+	}
+	return
 }

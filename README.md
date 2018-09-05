@@ -9,10 +9,10 @@ go get -u github.com/kyroy/aes256gcm
 
 Encrypt
 ```bash
-aes256gcm -in plain.file -out encrypted.file -key AES256Key-32Characters1234567890 -nonce bb8ef84243d2ee95a41c6c57 enc
+aes256gcm enc -in plain.file -out encrypted.file -key 2e3a40d4fef6b0fcfd664a1424aebac2cdd80df0af6d74fc5d44df84d3255718 -nonce bb8ef84243d2ee95a41c6c57
 ```
 
 Decrypt
 ```bash
-aes256gcm -in encrypted.file -out plain.file -key AES256Key-32Characters1234567890 -nonce bb8ef84243d2ee95a41c6c57 dec
+aes256gcm dec -in encrypted.file -out plain.file -key 2e3a40d4fef6b0fcfd664a1424aebac2cdd80df0af6d74fc5d44df84d3255718 -nonce bb8ef84243d2ee95a41c6c57
 ```
