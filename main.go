@@ -13,15 +13,37 @@ import (
 
 func main() {
 	var (
-		in, out    string
-		key, nonce string
+		strin, strout string
+		hexin, hexout string
+		key, nonce    string
 	)
-	flag.StringVar(&in, "in", "", "input file")
-	flag.StringVar(&out, "out", "", "output file")
+	flag.StringVar(&strin, "in", "", "input file")
+	flag.StringVar(&strout, "out", "", "output file")
+	flag.StringVar(&hexin, "hexin", "", "input file")
+	flag.StringVar(&hexout, "hexout", "", "output file")
 	flag.StringVar(&key, "key", "", "key")
 	flag.StringVar(&nonce, "nonce", "", "nonce")
 	flag.Parse()
-	if in == "" || out == "" || key == "" || nonce == "" {
+	var in, out []byte
+	if hexin != "" {
+		in, err := hex.DecodeString(hexin)
+		if err != nil {
+			log(err.Error())
+			os.Exit(1)
+		}
+	} else if strin != "" {
+		in = []byte(strin)
+	}
+	if hexout != "" {
+		out, err := hex.DecodeString(hexout)
+		if err != nil {
+			log(err.Error())
+			os.Exit(1)
+		}
+	} else if strout != "" {
+		out = []byte(strout)
+	}
+	if len(in) == 0 || len(out) == 0 || key == "" || nonce == "" {
 		printUsage(fmt.Sprintf("in=%s,out=%s,key=%s,nonce=%s", in, out, key, nonce))
 		os.Exit(1)
 	}
